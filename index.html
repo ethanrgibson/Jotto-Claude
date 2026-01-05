@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jotto</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Jotto</h1>
+      <p class="subtitle">A word deduction game</p>
+    </header>
+
+    <!-- Setup Phase -->
+    <div id="setup-screen" class="screen">
+      <div class="setup-content">
+        <h2>Choose Your Secret Word</h2>
+        <p class="hint">Pick a 5-letter word with no repeated letters</p>
+        <div class="input-group">
+          <input
+            type="text"
+            id="secret-word-input"
+            maxlength="5"
+            placeholder="Enter your word"
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <button id="start-game-btn" class="btn primary">Start Game</button>
+        </div>
+        <p id="setup-error" class="error"></p>
+      </div>
+    </div>
+
+    <!-- Game Phase -->
+    <div id="game-screen" class="screen hidden">
+      <div class="game-status">
+        <p id="turn-indicator">Your turn to guess</p>
+      </div>
+
+      <div class="game-boards">
+        <!-- Player's Board -->
+        <div class="board">
+          <h3>Your Guesses</h3>
+          <p class="board-hint">Guessing computer's word</p>
+          <div id="player-guesses" class="guess-list"></div>
+          <div class="guess-input-area">
+            <input
+              type="text"
+              id="guess-input"
+              maxlength="5"
+              placeholder="Enter guess"
+              autocomplete="off"
+              spellcheck="false"
+            >
+            <button id="submit-guess-btn" class="btn primary">Guess</button>
+          </div>
+          <p id="guess-error" class="error"></p>
+        </div>
+
+        <!-- Computer's Board -->
+        <div class="board">
+          <h3>Computer's Guesses</h3>
+          <p class="board-hint">Guessing your word: <span id="player-secret-display">*****</span></p>
+          <div id="computer-guesses" class="guess-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Phase -->
+    <div id="gameover-screen" class="screen hidden">
+      <div class="gameover-content">
+        <h2 id="gameover-title">Game Over</h2>
+        <p id="gameover-message"></p>
+        <div class="word-reveal">
+          <p>Your word: <strong id="reveal-player-word"></strong></p>
+          <p>Computer's word: <strong id="reveal-computer-word"></strong></p>
+        </div>
+        <button id="play-again-btn" class="btn primary">Play Again</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="words.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
