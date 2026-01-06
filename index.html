@@ -62,8 +62,56 @@
         <!-- Computer's Board -->
         <div class="board">
           <h3>Computer's Guesses</h3>
-          <p class="board-hint">Guessing your word: <span id="player-secret-display">*****</span></p>
+          <p class="board-hint">Guessing your word</p>
           <div id="computer-guesses" class="guess-list"></div>
+          <div id="feedback-area" class="feedback-area hidden">
+            <p class="feedback-prompt">How many letters match?</p>
+            <div class="feedback-buttons">
+              <button class="feedback-btn" data-value="0">0</button>
+              <button class="feedback-btn" data-value="1">1</button>
+              <button class="feedback-btn" data-value="2">2</button>
+              <button class="feedback-btn" data-value="3">3</button>
+              <button class="feedback-btn" data-value="4">4</button>
+              <button class="feedback-btn" data-value="5">5</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tracking Keyboard -->
+      <div class="tracking-keyboard">
+        <p class="keyboard-label">Letter Tracker <span class="keyboard-hint">(click to cycle: unmarked → potential → confirmed → eliminated)</span></p>
+        <div class="keyboard-row">
+          <button class="key" data-letter="Q">Q</button>
+          <button class="key" data-letter="W">W</button>
+          <button class="key" data-letter="E">E</button>
+          <button class="key" data-letter="R">R</button>
+          <button class="key" data-letter="T">T</button>
+          <button class="key" data-letter="Y">Y</button>
+          <button class="key" data-letter="U">U</button>
+          <button class="key" data-letter="I">I</button>
+          <button class="key" data-letter="O">O</button>
+          <button class="key" data-letter="P">P</button>
+        </div>
+        <div class="keyboard-row">
+          <button class="key" data-letter="A">A</button>
+          <button class="key" data-letter="S">S</button>
+          <button class="key" data-letter="D">D</button>
+          <button class="key" data-letter="F">F</button>
+          <button class="key" data-letter="G">G</button>
+          <button class="key" data-letter="H">H</button>
+          <button class="key" data-letter="J">J</button>
+          <button class="key" data-letter="K">K</button>
+          <button class="key" data-letter="L">L</button>
+        </div>
+        <div class="keyboard-row">
+          <button class="key" data-letter="Z">Z</button>
+          <button class="key" data-letter="X">X</button>
+          <button class="key" data-letter="C">C</button>
+          <button class="key" data-letter="V">V</button>
+          <button class="key" data-letter="B">B</button>
+          <button class="key" data-letter="N">N</button>
+          <button class="key" data-letter="M">M</button>
         </div>
       </div>
     </div>

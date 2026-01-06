@@ -6,8 +6,13 @@ const state = {
   computerGuesses: [],
   possibleWords: [],
   isPlayerTurn: true,
-  gameOver: false
+  gameOver: false,
+  pendingComputerGuess: null,
+  letterStates: {}
 };
+
+// Letter state cycle: unmarked -> potential -> confirmed -> eliminated -> unmarked
+const LETTER_STATES = ['unmarked', 'potential', 'confirmed', 'eliminated'];
 
 // DOM Elements
 const elements = {
@@ -28,7 +33,8 @@ const elements = {
   guessInput: document.getElementById('guess-input'),
   submitGuessBtn: document.getElementById('submit-guess-btn'),
   guessError: document.getElementById('guess-error'),
-  playerSecretDisplay: document.getElementById('player-secret-display'),
+  feedbackArea: document.getElementById('feedback-area'),
+  feedbackButtons: document.querySelectorAll('.feedback-btn'),
 
   // Game Over
   gameoverTitle: document.getElementById('gameover-title'),
@@ -68,15 +74,19 @@ function showScreen(screen) {
 }
 
 // Rendering Functions
-function renderGuess(container, word, matches, isCorrect = false) {
+function renderGuess(container, word, matches, isCorrect = false, isPending = false) {
   const item = document.createElement('div');
-  item.className = 'guess-item' + (isCorrect ? ' correct' : '');
+  let className = 'guess-item';
+  if (isCorrect) className += ' correct';
+  if (isPending) className += ' pending';
+  item.className = className;
   item.innerHTML = `
     <span class="guess-word">${word.toUpperCase()}</span>
-    <span class="guess-matches">${matches}</span>
+    <span class="guess-matches">${isPending ? '?' : matches}</span>
   `;
   container.appendChild(item);
   container.scrollTop = container.scrollHeight;
+  return item;
 }
 
 function renderEmptyState(container, message) {
@@ -84,7 +94,11 @@ function renderEmptyState(container, message) {
 }
 
 function updateTurnIndicator() {
-  if (state.isPlayerTurn) {
+  if (state.pendingComputerGuess) {
+    elements.turnIndicator.textContent = 'Tell the computer how many letters match';
+    elements.guessInput.disabled = true;
+    elements.submitGuessBtn.disabled = true;
+  } else if (state.isPlayerTurn) {
     elements.turnIndicator.textContent = 'Your turn to guess';
     elements.guessInput.disabled = false;
     elements.submitGuessBtn.disabled = false;
@@ -94,6 +108,43 @@ function updateTurnIndicator() {
     elements.guessInput.disabled = true;
     elements.submitGuessBtn.disabled = true;
   }
+}
+
+function showFeedbackButtons() {
+  elements.feedbackArea.classList.remove('hidden');
+}
+
+function hideFeedbackButtons() {
+  elements.feedbackArea.classList.add('hidden');
+}
+
+// Tracking Keyboard Functions
+function initLetterStates() {
+  state.letterStates = {};
+  for (let i = 65; i <= 90; i++) {
+    state.letterStates[String.fromCharCode(i)] = 'unmarked';
+  }
+  updateKeyboardUI();
+}
+
+function cycleLetterState(letter) {
+  const currentState = state.letterStates[letter];
+  const currentIndex = LETTER_STATES.indexOf(currentState);
+  const nextIndex = (currentIndex + 1) % LETTER_STATES.length;
+  state.letterStates[letter] = LETTER_STATES[nextIndex];
+  updateKeyboardUI();
+}
+
+function updateKeyboardUI() {
+  const keys = document.querySelectorAll('.key');
+  keys.forEach(key => {
+    const letter = key.dataset.letter;
+    const letterState = state.letterStates[letter];
+    key.classList.remove('potential', 'confirmed', 'eliminated');
+    if (letterState !== 'unmarked') {
+      key.classList.add(letterState);
+    }
+  });
 }
 
 // Computer AI
@@ -192,9 +243,13 @@ function startGame() {
   state.computerGuesses = [];
   state.isPlayerTurn = true;
   state.gameOver = false;
+  state.pendingComputerGuess = null;
 
   // Initialize AI
   initComputerAI();
+
+  // Initialize letter tracking
+  initLetterStates();
 
   // Setup UI
   elements.playerGuesses.innerHTML = '';
@@ -202,9 +257,9 @@ function startGame() {
   renderEmptyState(elements.playerGuesses, 'No guesses yet');
   renderEmptyState(elements.computerGuesses, 'Waiting...');
 
-  elements.playerSecretDisplay.textContent = word.toUpperCase();
   elements.guessInput.value = '';
   elements.guessError.textContent = '';
+  hideFeedbackButtons();
 
   // Show game screen
   showScreen(elements.gameScreen);
@@ -212,7 +267,7 @@ function startGame() {
 }
 
 function playerGuess() {
-  if (!state.isPlayerTurn || state.gameOver) return;
+  if (!state.isPlayerTurn || state.gameOver || state.pendingComputerGuess) return;
 
   const guess = elements.guessInput.value.trim().toLowerCase();
 
@@ -280,15 +335,45 @@ function computerTurn() {
 
   // Make guess
   const guess = computerMakeGuess();
-  const matches = countMatches(guess, state.playerWord);
-  const isCorrect = guess === state.playerWord;
+
+  // Log the guess to console for debugging
+  console.log(`Computer guesses: ${guess.toUpperCase()} (${state.possibleWords.length} possible words remaining)`);
+
+  // Store pending guess - we don't know matches yet
+  state.pendingComputerGuess = {
+    word: guess,
+    element: renderGuess(elements.computerGuesses, guess, 0, false, true)
+  };
+
+  // Show feedback buttons and update turn indicator
+  showFeedbackButtons();
+  updateTurnIndicator();
+}
+
+function handleFeedback(matchCount) {
+  if (!state.pendingComputerGuess || state.gameOver) return;
+
+  const guess = state.pendingComputerGuess.word;
+  const isCorrect = matchCount === 5;
+
+  // Update the pending guess element
+  const element = state.pendingComputerGuess.element;
+  element.classList.remove('pending');
+  if (isCorrect) {
+    element.classList.add('correct');
+  }
+  element.querySelector('.guess-matches').textContent = matchCount;
 
   // Record guess and update AI state
-  state.computerGuesses.push({ word: guess, matches });
-  filterPossibleWords(guess, matches);
+  state.computerGuesses.push({ word: guess, matches: matchCount });
+  filterPossibleWords(guess, matchCount);
 
-  // Render guess
-  renderGuess(elements.computerGuesses, guess, matches, isCorrect);
+  // Log remaining possibilities
+  console.log(`After feedback (${matchCount} matches): ${state.possibleWords.length} possible words remaining`);
+
+  // Clear pending state
+  state.pendingComputerGuess = null;
+  hideFeedbackButtons();
 
   // Check for computer win
   if (isCorrect) {
@@ -318,6 +403,12 @@ function endGame(playerWon) {
   elements.revealPlayerWord.textContent = state.playerWord;
   elements.revealComputerWord.textContent = state.computerWord;
 
+  // Log final state
+  console.log('=== Game Over ===');
+  console.log(`Player word: ${state.playerWord.toUpperCase()}`);
+  console.log(`Computer word: ${state.computerWord.toUpperCase()}`);
+  console.log(`Winner: ${playerWon ? 'Player' : 'Computer'}`);
+
   // Show game over screen after a short delay
   setTimeout(() => {
     showScreen(elements.gameoverScreen);
@@ -327,6 +418,7 @@ function endGame(playerWon) {
 function resetGame() {
   elements.secretWordInput.value = '';
   elements.setupError.textContent = '';
+  hideFeedbackButtons();
   showScreen(elements.setupScreen);
   elements.secretWordInput.focus();
 }
@@ -335,6 +427,22 @@ function resetGame() {
 elements.startGameBtn.addEventListener('click', startGame);
 elements.submitGuessBtn.addEventListener('click', playerGuess);
 elements.playAgainBtn.addEventListener('click', resetGame);
+
+// Feedback button listeners
+elements.feedbackButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const value = parseInt(btn.dataset.value, 10);
+    handleFeedback(value);
+  });
+});
+
+// Keyboard tracking listeners
+document.querySelectorAll('.key').forEach(key => {
+  key.addEventListener('click', () => {
+    const letter = key.dataset.letter;
+    cycleLetterState(letter);
+  });
+});
 
 // Enter key support
 elements.secretWordInput.addEventListener('keydown', (e) => {

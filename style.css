@@ -310,3 +310,130 @@ input[type="text"]::placeholder {
   padding: 40px 20px;
   font-style: italic;
 }
+
+/* Feedback Area */
+.feedback-area {
+  margin-top: 15px;
+  padding: 15px;
+  background: #fff9e6;
+  border: 1px solid #f0e6cc;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.feedback-area.hidden {
+  display: none;
+}
+
+.feedback-prompt {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  margin-bottom: 10px;
+}
+
+.feedback-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.feedback-btn {
+  width: 36px;
+  height: 36px;
+  border: 2px solid #e0e0e0;
+  border-radius: 50%;
+  background: white;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.feedback-btn:hover {
+  border-color: #3498db;
+  background: #ebf5fb;
+}
+
+.feedback-btn:active {
+  transform: scale(0.95);
+}
+
+/* Tracking Keyboard */
+.tracking-keyboard {
+  margin-top: 20px;
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.keyboard-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.keyboard-hint {
+  font-weight: 400;
+  color: #7f8c8d;
+  font-size: 0.8rem;
+}
+
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.keyboard-row:last-child {
+  margin-bottom: 0;
+}
+
+.key {
+  width: 38px;
+  height: 42px;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  background: #f8f9fa;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.key:hover {
+  background: #e8e8e8;
+}
+
+.key.potential {
+  background: #fff3cd;
+  border-color: #ffc107;
+  color: #856404;
+}
+
+.key.confirmed {
+  background: #d4edda;
+  border-color: #28a745;
+  color: #155724;
+}
+
+.key.eliminated {
+  background: #6c757d;
+  border-color: #5a6268;
+  color: white;
+}
+
+/* Pending guess (waiting for feedback) */
+.guess-item.pending {
+  background: #fff9e6;
+  border: 1px dashed #f0c36d;
+}
+
+.guess-item.pending .guess-matches {
+  background: #95a5a6;
+}
