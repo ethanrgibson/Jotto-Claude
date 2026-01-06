@@ -239,6 +239,10 @@ function startGame() {
   // Initialize game state
   state.playerWord = word;
   state.computerWord = WORDS[Math.floor(Math.random() * WORDS.length)];
+
+  // Log computer's word for debugging
+  console.log(`Computer's secret word: ${state.computerWord.toUpperCase()}`);
+
   state.playerGuesses = [];
   state.computerGuesses = [];
   state.isPlayerTurn = true;
@@ -336,8 +340,6 @@ function computerTurn() {
   // Make guess
   const guess = computerMakeGuess();
 
-  // Log the guess to console for debugging
-  console.log(`Computer guesses: ${guess.toUpperCase()} (${state.possibleWords.length} possible words remaining)`);
 
   // Store pending guess - we don't know matches yet
   state.pendingComputerGuess = {
@@ -368,8 +370,6 @@ function handleFeedback(matchCount) {
   state.computerGuesses.push({ word: guess, matches: matchCount });
   filterPossibleWords(guess, matchCount);
 
-  // Log remaining possibilities
-  console.log(`After feedback (${matchCount} matches): ${state.possibleWords.length} possible words remaining`);
 
   // Clear pending state
   state.pendingComputerGuess = null;
@@ -403,11 +403,6 @@ function endGame(playerWon) {
   elements.revealPlayerWord.textContent = state.playerWord;
   elements.revealComputerWord.textContent = state.computerWord;
 
-  // Log final state
-  console.log('=== Game Over ===');
-  console.log(`Player word: ${state.playerWord.toUpperCase()}`);
-  console.log(`Computer word: ${state.computerWord.toUpperCase()}`);
-  console.log(`Winner: ${playerWon ? 'Player' : 'Computer'}`);
 
   // Show game over screen after a short delay
   setTimeout(() => {
