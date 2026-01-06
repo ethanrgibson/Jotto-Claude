@@ -317,3 +317,6 @@ const VALID_WORDS = WORD_LIST
 
 // Remove duplicates
 const WORDS = [...new Set(VALID_WORDS)];
+
+// Debug: confirm word list loaded
+console.log(`Word list loaded: ${WORDS.length} words available`);
